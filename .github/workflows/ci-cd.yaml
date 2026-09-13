@@ -2,36 +2,38 @@ name: Enterprise CI/CD Pipeline
 
 on:
 push:
-branches: [ "main", "feature/**" ]
+branches:
+  - main
+  - "feature/**"
 pull_request:
-branches: [ "main" ]
+branches:
+  - main
 
 jobs:
 validate-and-test:
 runs-on: ubuntu-latest
 steps:
-- name: Checkout Code
-  uses: actions/checkout@v4
+  - name: Checkout Code
+    uses: actions/checkout@v4
 
-- name: Verify YAML Syntax Across All Tiers
-  run: |
-    echo "Checking YAML formatting for all Kubernetes manifests..."
-    python3 -c '
-    import glob, sys
-    # Check standard python yaml or built-in parsing approach
-    files = glob.glob("k8s/**/*.yaml", recursive=True)
-    print(f"Discovered {len(files)} YAML manifest files.")
-    for fpath in files:
-        with open(fpath, "r", encoding="utf-8") as f:
-            content = f.read()
-        if not content.strip():
-            print(f"Error: {fpath} is empty.")
-            sys.exit(1)
-    print("All YAML files successfully verified for non-empty syntax structure.")
-    '
+  - name: Verify YAML Syntax Across All Tiers
+    run: |
+      echo "Checking YAML formatting for all Kubernetes manifests..."
+      python3 -c '
+      import glob, sys
+      files = glob.glob("k8s/**/*.yaml", recursive=True)
+      print(f"Discovered {len(files)} YAML manifest files.")
+      for fpath in files:
+          with open(fpath, "r", encoding="utf-8") as f:
+              content = f.read()
+          if not content.strip():
+              print(f"Error: {fpath} is empty.")
+              sys.exit(1)
+      print("All YAML files successfully verified.")
+      '
 
-- name: Verify Deployment Script Executable and Syntax
-  run: |
-    chmod +x scripts/deploy-all.sh
-    bash -n scripts/deploy-all.sh
-    echo "Master deployment script syntax check passed."
+  - name: Verify Deployment Script Executable and Syntax
+    run: |
+      chmod +x scripts/deploy-all.sh
+      bash -n scripts/deploy-all.sh
+      echo "Master deployment script syntax check passed."
