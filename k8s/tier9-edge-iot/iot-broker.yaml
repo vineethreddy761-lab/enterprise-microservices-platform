@@ -2,50 +2,54 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
 name: enterprise-iot-broker
-namespace: enterprise-ingress
+namespace: enterprise-iot
+labels:
+app: mqtt-broker
+tier: tier9-edge-iot
 spec:
 replicas: 2
 selector:
 matchLabels:
-  app: iot-broker
+  app: mqtt-broker
 template:
 metadata:
   labels:
-    app: iot-broker
+    app: mqtt-broker
 spec:
-  affinity:
-    nodeAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-        nodeSelectorTerms:
-        - matchExpressions:
-          - key: topology.kubernetes.io/tier
-            operator: In
-            values:
-            - edge-iot
   containers:
   - name: mosquitto
-    image: eclipse-mosquitto:latest
+    image: eclipse-mosquitto:2.0
     ports:
     - containerPort: 1883
       name: mqtt
+    - containerPort: 9001
+      name: websockets
     resources:
       requests:
-        cpu: "100m"
-        memory: "128Mi"
+        cpu: "200m"
+        memory: "256Mi"
       limits:
         cpu: "500m"
         memory: "512Mi"
+    readinessProbe:
+      tcpSocket:
+        port: 1883
+      initialDelaySeconds: 5
+      periodSeconds: 10
 ---
 apiVersion: v1
 kind: Service
 metadata:
 name: iot-broker-service
-namespace: enterprise-ingress
+namespace: enterprise-iot
 spec:
-type: LoadBalancer
 selector:
-app: iot-broker
+app: mqtt-broker
 ports:
 - port: 1883
 targetPort: 1883
 name: mqtt
+- port: 9001
+targetPort: 9001
+name: websockets
+type: ClusterIP
