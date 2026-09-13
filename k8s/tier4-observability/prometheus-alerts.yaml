@@ -1,0 +1,44 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+name: enterprise-service-mesh-alerts
+namespace: enterprise-observability
+labels:
+prometheus: k8s
+role: alert-rules
+spec:
+groups:
+- name: MicroservicesMeshAlerts
+rules:
+- alert: HighServiceMeshErrorRate
+  expr: sum(rate(istio_requests_total{reporter="destination",response_code=~"5.*"}[5m])) by (destination_workload) / sum(rate(istio_requests_total{reporter="destination"}[5m])) by (destination_workload) > 0.05
+  for: 2m
+  labels:
+    severity: critical
+  annotations:
+    summary: "High HTTP 5xx error rate detected on {{ $labels.destination_workload }}"
+    description: "Service mesh telemetry indicates error rate exceeds 5% over the last 5 minutes."
+
+- alert: ServiceMeshLatencySpike
+  expr: histogram_quantile(0.99, sum(rate(istio_request_duration_milliseconds_bucket{reporter="destination"}[5m])) by (le, destination_workload)) > 500
+  for: 3m
+  labels:
+    severity: warning
+  annotations:
+    summary: "High P99 latency on {{ $labels.destination_workload }}"
+    description: "P99 request latency has crossed 500ms threshold."
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+name: istio-mesh-monitor
+namespace: enterprise-observability
+labels:
+release: prometheus-stack
+spec:
+selector:
+matchLabels:
+  istio: pilot
+endpoints:
+- port: http-monitoring
+interval: 15s

@@ -1,20 +1,29 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-name: enterprise-platform-sync
+name: enterprise-microservices-platform
 namespace: argocd
+finalizers:
+- resources-finalizer.argocd.argoproj.io
 spec:
 project: default
 source:
-repoURL: 'https://github.com/vineethreddy761-lab/enterprise-microservices-platform.git'
-targetRevision: MAIN
-path: k8s/
+repoURL: "https://github.com/vineethreddy761-lab/enterprise-microservices-platform.git"
+targetRevision: HEAD
+path: k8s
 destination:
-server: 'https://kubernetes.default.svc'
-namespace: enterprise-backend
+server: "https://kubernetes.default.svc"
+namespace: enterprise-core
 syncPolicy:
 automated:
   prune: true
   selfHeal: true
 syncOptions:
-- CreateNamespace=true
+  - CreateNamespace=true
+  - ApplyOutOfSyncOnly=true
+retry:
+  limit: 5
+  backoff:
+    duration: 5s
+    factor: 2
+    maxDuration: 3m

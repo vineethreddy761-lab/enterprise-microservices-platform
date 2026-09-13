@@ -1,0 +1,29 @@
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+name: default-strict-mtls
+namespace: enterprise-core
+spec:
+mtls:
+mode: STRICT
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+name: enterprise-platform-routing
+namespace: enterprise-ingress
+spec:
+hosts:
+- "platform.enterprise.local"
+gateways:
+- enterprise-gateway
+http:
+- match:
+- uri:
+    prefix: /api/v1
+route:
+- destination:
+    host: backend-service.enterprise-backend.svc.cluster.local
+    port:
+      number: 8080
+  weight: 100
