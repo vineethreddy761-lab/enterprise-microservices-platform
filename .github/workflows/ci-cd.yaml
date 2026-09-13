@@ -18,17 +18,12 @@ steps:
   with:
     version: 'v1.28.0'
 
-- name: Run Manifest Linter and Dry-Run Validation
+- name: Run Manifest Dry-Run Validation Recursively
   run: |
-    echo "Validating Kubernetes Manifests across all tiers..."
-    for dir in k8s/tier*; do
-      if [ -d "$dir" ]; then
-        echo "Checking manifests in $dir..."
-        kubectl apply --dry-run=client -k "$dir" || kubectl apply --dry-run=client -f "$dir/"
-      fi
-    done
+    echo "Validating all Kubernetes manifests recursively in k8s/..."
+    kubectl apply --recursive --dry-run=client -f k8s/
 
-- name: Verify Deployment Script Executable
+- name: Verify Deployment Script Executable and Syntax
   run: |
     chmod +x scripts/deploy-all.sh
     bash -n scripts/deploy-all.sh
