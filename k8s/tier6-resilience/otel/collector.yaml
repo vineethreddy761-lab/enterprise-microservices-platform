@@ -1,10 +1,33 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+name: otel-collector-conf
+namespace: enterprise-observability
+data:
+otel-collector-config.yaml: |
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+processors:
+  batch:
+exporters:
+  logging:
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [logging]
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
 name: otel-collector
-namespace: enterprise-control-plane
+namespace: enterprise-observability
 spec:
-replicas: 2
+replicas: 1
 selector:
 matchLabels:
   app: otel-collector
@@ -13,29 +36,13 @@ metadata:
   labels:
     app: otel-collector
 spec:
-  nodeSelector:
-    topology.kubernetes.io/tier: ml-analytics
   containers:
   - name: otel-collector
-    image: otel/opentelemetry-collector-contrib:0.92.0
-    ports:
-    - containerPort: 4317
-      name: otlp-grpc
-    - containerPort: 4318
-      name: otlp-http
----
-apiVersion: v1
-kind: Service
-metadata:
-name: otel-collector-svc
-namespace: enterprise-control-plane
-spec:
-selector:
-app: otel-collector
-ports:
-- port: 4317
-targetPort: 4317
-name: otlp-grpc
-- port: 4318
-targetPort: 4318
-name: otlp-http
+    image: otel/opentelemetry-collector:latest
+    resources:
+      requests:
+        cpu: "200m"
+        memory: "256Mi"
+      limits:
+        cpu: "500m"
+        memory: "512Mi"
