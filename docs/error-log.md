@@ -29,3 +29,9 @@ Prevention: How to avoid or automate detection in the future.
 - **Root Cause:** The `api_limit` shared memory zone size was allocated to a compact `10m`, which became fully exhausted under a massive flood of unique IP addresses. When the zone runs out of space, Nginx fails to allocate tracking nodes for new client keys and rejects legitimate traffic.
 - **Solution:** Increased the shared memory zone allocation size from `10m` to `64m` (supporting over 1 million concurrent tracking states) and introduced dynamic caching map variables to bypass rate-limiting checks safely for internal trusted health-check probes.
 - **Prevention:** Incorporate baseline memory sizing formulas ($1\text{MB}$ per ~16,000 unique client states) during capacity planning and add Prometheus monitoring alerts tracking Nginx shared memory utilization metrics.
+
+## [ERR-004] OPA Admission Webhook Timeouts and Kubernetes Control Plane Blocking
+- **Symptom:** Kubernetes API server failed to process deployment manifests, returning `Webhook call failed: Post "https://opa-validator.enterprise-control-plane.svc:443/v1/validate": context deadline exceeded` errors across multiple namespaces.
+- **Root Cause:** The OPA validation webhook lacked an explicit tight timeout configuration and suffered from single-replica bottlenecks when high-volume GitOps sync operations pushed updates for 50+ microservices simultaneously.
+- **Solution:** Configured explicit `timeoutSeconds: 3` in the ValidatingWebhookConfiguration, scaled OPA replicas to 3 with Pod Anti-Affinity rules, and optimized Rego policy evaluation caching.
+- **Prevention:** Enforce strict timeout ceilings on all Kubernetes admission webhooks and run concurrency stress tests during control plane provisioning.
