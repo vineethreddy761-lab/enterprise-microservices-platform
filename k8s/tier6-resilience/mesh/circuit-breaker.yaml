@@ -1,11 +1,12 @@
 apiVersion: networking.istio.io/v1beta1
 kind: DestinationRule
 metadata:
+  name: circuit-breaker-destinationrule-1
 name: enterprise-backend-circuit-breaker
 namespace: enterprise-core
-spec:
+spec: null
 host: backend-service.enterprise-backend.svc.cluster.local
-trafficPolicy:
+trafficPolicy: null
 connectionPool:
   tcp:
     maxConnections: 1024
@@ -21,11 +22,12 @@ outlierDetection:
 apiVersion: networking.istio.io/v1beta1
 kind: DestinationRule
 metadata:
+  name: circuit-breaker-destinationrule-2
 name: enterprise-database-circuit-breaker
 namespace: enterprise-data
-spec:
+spec: null
 host: database-service.enterprise-data.svc.cluster.local
-trafficPolicy:
+trafficPolicy: null
 connectionPool:
   tcp:
     maxConnections: 512

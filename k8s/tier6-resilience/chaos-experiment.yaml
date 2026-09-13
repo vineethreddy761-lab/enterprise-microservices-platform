@@ -1,38 +1,40 @@
 apiVersion: chaos-mesh.org/v1alpha1
 kind: NetworkChaos
 metadata:
+  name: chaos-experiment-networkchaos-1
 name: backend-latency-injection
 namespace: enterprise-resilience
-spec:
+spec: null
 action: delay
 mode: one
-selector:
+selector: null
 namespaces:
-  - enterprise-backend
+- enterprise-backend
 labelSelectors:
   app: backend-service
-delay:
-latency: "250ms"
-jitter: "50ms"
-correlation: "25"
-duration: "30s"
-scheduler:
-cron: "*/10 * * * *"
+delay: null
+latency: 250ms
+jitter: 50ms
+correlation: '25'
+duration: 30s
+scheduler: null
+cron: '*/10 * * * *'
 ---
 apiVersion: chaos-mesh.org/v1alpha1
 kind: PodChaos
 metadata:
+  name: chaos-experiment-podchaos-2
 name: backend-pod-failure
 namespace: enterprise-resilience
-spec:
+spec: null
 action: pod-failure
 mode: fixed
-value: "1"
-selector:
+value: '1'
+selector: null
 namespaces:
-  - enterprise-backend
+- enterprise-backend
 labelSelectors:
   app: backend-service
-duration: "20s"
-scheduler:
-cron: "*/15 * * * *"
+duration: 20s
+scheduler: null
+cron: '*/15 * * * *'

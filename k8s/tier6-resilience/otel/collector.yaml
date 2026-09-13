@@ -1,48 +1,51 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
+  name: collector-configmap-1
 name: otel-collector-conf
 namespace: enterprise-observability
-data:
-otel-collector-config.yaml: |
+data: null
+otel-collector-config.yaml: ''
 receivers:
   otlp:
     protocols:
-      grpc:
-      http:
+      grpc: null
+      http: null
 processors:
-  batch:
+  batch: null
 exporters:
-  logging:
+  logging: null
 service:
   pipelines:
     traces:
-      receivers: [otlp]
-      processors: [batch]
-      exporters: [logging]
+      receivers:
+      - otlp
+      processors:
+      - batch
+      exporters:
+      - logging
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-name: otel-collector
-namespace: enterprise-observability
-spec:
-replicas: 1
-selector:
-matchLabels:
-  app: otel-collector
-template:
-metadata:
   labels:
     app: otel-collector
+  name: collector-deployment-2
+name: otel-collector
+namespace: enterprise-observability
 spec:
   containers:
   - name: otel-collector
     image: otel/opentelemetry-collector:latest
     resources:
       requests:
-        cpu: "200m"
-        memory: "256Mi"
+        cpu: 200m
+        memory: 32Mi
       limits:
-        cpu: "500m"
-        memory: "512Mi"
+        cpu: 500m
+        memory: 32Mi
+replicas: 1
+selector: null
+matchLabels:
+  app: otel-collector
+template: null

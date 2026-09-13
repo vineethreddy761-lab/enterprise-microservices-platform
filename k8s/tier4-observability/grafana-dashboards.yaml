@@ -1,26 +1,21 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
+  name: grafana-dashboards-configmap-1
 name: grafana-dashboards-config
 namespace: enterprise-observability
-data:
-dashboard-title: "Enterprise Microservices Overview"
-dashboard-timezone: "browser"
+data: null
+dashboard-title: Enterprise Microservices Overview
+dashboard-timezone: browser
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-name: grafana
-namespace: enterprise-observability
-spec:
-replicas: 1
-selector:
-matchLabels:
-  app: grafana
-template:
-metadata:
   labels:
     app: grafana
+  name: grafana-dashboards-deployment-2
+name: grafana
+namespace: enterprise-observability
 spec:
   containers:
   - name: grafana
@@ -30,8 +25,13 @@ spec:
       name: http
     resources:
       requests:
-        cpu: "200m"
-        memory: "256Mi"
+        cpu: 200m
+        memory: 256Mi
       limits:
-        cpu: "500m"
-        memory: "512Mi"
+        cpu: 500m
+        memory: 512Mi
+replicas: 1
+selector: null
+matchLabels:
+  app: grafana
+template: null

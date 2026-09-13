@@ -1,21 +1,17 @@
 apiVersion: v1
 kind: Namespace
 metadata:
+  name: falco-security-namespace-1
 name: enterprise-security
 ---
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-name: falco-runtime-security
-namespace: enterprise-security
-spec:
-selector:
-matchLabels:
-  app: falco
-template:
-metadata:
   labels:
     app: falco
+  name: falco-security-daemonset-2
+name: falco-runtime-security
+namespace: enterprise-security
 spec:
   nodeSelector:
     topology.kubernetes.io/tier: security
@@ -34,3 +30,7 @@ spec:
   - name: docker-socket
     hostPath:
       path: /var/run/docker.sock
+selector: null
+matchLabels:
+  app: falco
+template: null

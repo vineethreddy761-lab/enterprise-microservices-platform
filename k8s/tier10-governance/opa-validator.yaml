@@ -1,17 +1,11 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-name: enterprise-opa-governance
-namespace: enterprise-control-plane
-spec:
-replicas: 1
-selector:
-matchLabels:
-  app: opa-governance
-template:
-metadata:
   labels:
     app: opa-governance
+  name: opa-validator-deployment-1
+name: enterprise-opa-governance
+namespace: enterprise-control-plane
 spec:
   affinity:
     nodeAffinity:
@@ -26,28 +20,34 @@ spec:
   - name: opa
     image: openpolicyagent/opa:latest-rootless
     args:
-    - "run"
-    - "--server"
-    - "--addr=0.0.0.0:8181"
+    - run
+    - --server
+    - --addr=0.0.0.0:8181
     ports:
     - containerPort: 8181
       name: http
     resources:
       requests:
-        cpu: "200m"
-        memory: "256Mi"
+        cpu: 200m
+        memory: 32Mi
       limits:
-        cpu: "500m"
-        memory: "512Mi"
+        cpu: 500m
+        memory: 32Mi
+replicas: 1
+selector: null
+matchLabels:
+  app: opa-governance
+template: null
 ---
 apiVersion: v1
 kind: Service
 metadata:
+  name: opa-validator-service-2
 name: governance-service
 namespace: enterprise-control-plane
-spec:
+spec: null
 type: ClusterIP
-selector:
+selector: null
 app: opa-governance
 ports:
 - port: 8181

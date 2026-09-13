@@ -1,17 +1,11 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-name: velero-backup-agent
-namespace: enterprise-control-plane
-spec:
-replicas: 1
-selector:
-matchLabels:
-  app: velero-backup
-template:
-metadata:
   labels:
     app: velero-backup
+  name: velero-backup-deployment
+name: velero-backup-agent
+namespace: enterprise-control-plane
 spec:
   affinity:
     nodeAffinity:
@@ -30,8 +24,13 @@ spec:
     - server
     resources:
       requests:
-        cpu: "500m"
-        memory: "1Gi"
+        cpu: 500m
+        memory: 64Mi
       limits:
-        cpu: "1000m"
-        memory: "2Gi"
+        cpu: 1000m
+        memory: 64Mi
+replicas: 1
+selector: null
+matchLabels:
+  app: velero-backup
+template: null

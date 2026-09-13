@@ -1,7 +1,3 @@
-# Enterprise 10-Tier Microservices Platform
-
-A production-grade, enterprise-scale microservices platform featuring strict architectural isolation, dedicated multi-node server pools, automated GitOps synchronization, runtime security auditing, and continuous CI/CD validation.
-
 ---
 
 ## Architecture Overview (10 Tiers)
@@ -24,3 +20,19 @@ A production-grade, enterprise-scale microservices platform featuring strict arc
 - **Runtime Threat Detection**: Falco daemonset auditing kernel system calls.
 - **Hardened Access**: Encrypted OpenSSH jump host bastion deployment.
 - **CI/CD Pipeline**: GitHub Actions offline YAML syntax validation and deployment script verification.
+
+## Enterprise Microservices Platform (Lightweight Local Setup)
+
+This repository houses an enterprise microservices platform optimized for local execution using **Kind (Kubernetes in Docker)** and **Docker** on resource-constrained development environments (such as Ubuntu VMs).
+
+### Architecture & Resource Optimization Strategy
+To prevent system freezes, storage I/O saturation, and kernel deadlocks (`D` state processes), this platform adheres to strict operational guidelines:
+- **Single-Replica Deployments:** All microservices default to `replicas: 1` during initial rollout to minimize concurrent container image extraction and disk contention.
+- **Docker Daemon Tuning:** Configured with elevated `ulimits` and strict log rotation to manage container logging overhead safely.
+- **Multi-Terminal SSH Workflow:** Operations are managed across dedicated terminal windows (e.g., separate tabs for cluster management, workload deployment, and log streaming) to ensure responsiveness if a process blocks.
+
+### Quick Start
+1. Recreate the Kind cluster:
+   ```bash
+   kind create cluster --name enterprise-platform
+   kind export kubeconfig --name enterprise-platform

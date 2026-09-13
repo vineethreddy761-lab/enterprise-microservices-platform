@@ -40,7 +40,15 @@ This document records the compilation, YAML validation, and CI/CD workflow error
 2. Splitting python commands across multiple lines in bash heredocs without correct block continuation.
 * **Successful Fix:** Programmatically generated `.github/workflows/ci-cd.yaml` using a clean Python script leveraging `yaml.dump()` with explicit LF line endings (`newline="\n"`), guaranteeing 100% syntactic compliance for GitHub Actions.
 
----
+## Incident 5: Kind Control Plane Disconnection & API Timeout
+
+* **Error Encountered:** `Unable to connect to the server: net/http: TLS handshake timeout` followed by `ERROR: could not locate any control plane nodes for cluster named 'enterprise-platform'` when running `docker ps` or `kubectl`.
+* **Root Cause:** The Kind control-plane container stopped due to brief resource constraints or Docker daemon state reset during concurrent terminal operations.
+* **Successful Fix:** Verified container status via Docker, recreated the Kind cluster cleanly, and re-exported the kubeconfig context:
+  ```bash
+  kind delete cluster --name enterprise-platform
+  kind create cluster --name enterprise-platform
+  kind export kubeconfig --name enterprise-platform---
 
 ## Final Pipeline Status
 * **Status:** **SUCCESS**
