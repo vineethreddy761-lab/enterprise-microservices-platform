@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: enterprise-backend
-  namespace: default
 spec:
   replicas: 1
   selector:
@@ -21,7 +20,7 @@ spec:
         - containerPort: 8080
         env:
         - name: DB_HOST
-          value: "enterprise-database-svc"
+          value: "enterprise-database-svc.enterprise-data.svc.cluster.local"
         - name: DB_PORT
           value: "5432"
         - name: DB_NAME
