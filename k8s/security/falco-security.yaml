@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+name: enterprise-security
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+name: falco-runtime-security
+namespace: enterprise-security
+spec:
+selector:
+matchLabels:
+  app: falco
+template:
+metadata:
+  labels:
+    app: falco
+spec:
+  nodeSelector:
+    topology.kubernetes.io/tier: security
+  hostNetwork: true
+  hostIPC: true
+  hostPID: true
+  containers:
+  - name: falco
+    image: falcosecurity/falco:latest
+    securityContext:
+      privileged: true
+    volumeMounts:
+    - mountPath: /var/run/docker.sock
+      name: docker-socket
+  volumes:
+  - name: docker-socket
+    hostPath:
+      path: /var/run/docker.sock

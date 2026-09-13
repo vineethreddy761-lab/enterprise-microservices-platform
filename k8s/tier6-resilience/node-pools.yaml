@@ -30,3 +30,20 @@ name: worker-edge-01
 labels:
 node.kubernetes.io/instance-type: c6i.xlarge
 topology.kubernetes.io/tier: ingress
+
+---
+apiVersion: v1
+kind: Node
+metadata:
+name: worker-security-01
+labels:
+node.kubernetes.io/instance-type: c6i.xlarge
+topology.kubernetes.io/tier: security
+---
+apiVersion: v1
+kind: Node
+metadata:
+name: worker-bastion-01
+labels:
+node.kubernetes.io/instance-type: t3.medium
+topology.kubernetes.io/tier: bastion
