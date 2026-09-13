@@ -1,15 +1,17 @@
-# Project Requirements Document (PRD): Enterprise Multi-Cloud Microservices Platform
+# Enterprise Platform System Requirements
 
-## 1. Executive Summary & Objectives
-The goal of this project is to architect, build, and deploy an enterprise-grade, highly resilient microservices platform capable of supporting **50+ concurrent services and stateful applications**.
+## Hardware & Compute Specifications
+- **Cluster Control Plane**: Minimum 3 master nodes (vCPU: 4, RAM: 16GB).
+- **Worker Node Pools**:
+- **Edge Ingress**: 2x `t3.medium` nodes (API Gateway & Ingress).
+- **Backend Compute**: 4x `c6i.2xlarge` nodes (Core Application workloads).
+- **Data Tier**: 2x `i3en.2xlarge` nodes (PostgreSQL & Redis Cache).
+- **Security & Bastion**: 2x `c6i.xlarge` / `t3.medium` (Falco & SSH Jump Host).
+- **Backup & DR**: 1x `t3.xlarge` (Velero agent).
+- **AI/ML GPU**: 1x `g4dn.xlarge` (NVIDIA T4 GPU inference).
+- **IoT & Governance**: 2x `t3.small` / `t3.medium` (MQTT broker & OPA).
 
-## 2. System Architecture & Tiering
-- **Tier 1 (Edge & Ingress Layer):** Nginx API Gateway, Reverse Proxies, WAF simulation.
-- **Tier 2 (Application & Backend Tier):** Isolated internal network hosting 40+ microservices partitioned by business domains (`critical-infra`, `core-business`, `batch-workers`).
-- **Tier 3 (Data & Storage Tier):** Locked-down private subnets hosting PostgreSQL/MySQL clusters, Redis, and object storage.
-- **Tier 4 (Observability & Control Plane):** Prometheus, Grafana, Loki, Alertmanager, and HashiCorp Vault.
-
-## 3. Non-Functional Requirements (NFRs)
-- **Performance:** $p_{99}$ latency under $50\text{ms}$ for core services.
-- **Resiliency:** $99.99\%$ uptime via multi-region active-active patterns and Chaos engineering.
-- **Security:** Mandatory mTLS, kernel-level eBPF enforcement, and Cosign container signing.
+## Software & Toolchain Prerequisites
+- **Kubernetes**: v1.28+ cluster runtime.
+- **GitOps & Operators**: ArgoCD v2.8+, Flagger, KEDA v2.12+, Karpenter, Chaos Mesh.
+- **CLI Utilities**: `kubectl`, `bash`, `python3` (with standard libraries).

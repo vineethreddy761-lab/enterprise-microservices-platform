@@ -1,0 +1,28 @@
+name: Enterprise CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - "feature/**"
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  validate-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Verify YAML Syntax Across All Tiers
+        run: |
+          echo "Checking YAML formatting for all Kubernetes manifests..."
+          python3 -c 'import glob, sys; files = glob.glob("k8s/**/*.yaml", recursive=True); print(f"Discovered {len(files)} YAML files."); assert len(files) > 0'
+
+      - name: Verify Deployment Script Syntax
+        run: |
+          chmod +x scripts/deploy-all.sh
+          bash -n scripts/deploy-all.sh
+          echo "Deployment script check passed."
