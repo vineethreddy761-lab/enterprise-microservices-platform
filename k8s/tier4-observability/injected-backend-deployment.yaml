@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+name: secure-backend-service
+namespace: enterprise-backend
+spec:
+replicas: 2
+selector:
+matchLabels:
+  app: secure-backend
+template:
+metadata:
+  labels:
+    app: secure-backend
+  annotations:
+    vault.hashicorp.com/agent-inject: "true"
+    vault.hashicorp.com/role: "backend-service-role"
+    vault.hashicorp.com/agent-inject-secret-db-creds.json: "database/creds/backend-service-role"
+spec:
+  serviceAccountName: vault-auth
+  containers:
+  - name: app
+    image: python:3.11-slim
+    command: ["sleep", "infinity"]
+    volumeMounts:
+    - name: secret-volume
+      mountPath: /vault/secrets
