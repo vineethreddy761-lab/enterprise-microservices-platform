@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+name: enterprise-iot-broker
+namespace: enterprise-iot
+labels:
+app: mqtt-broker
+tier: tier9-edge-iot
+spec:
+replicas: 2
+selector:
+matchLabels:
+  app: mqtt-broker
+template:
+metadata:
+  labels:
+    app: mqtt-broker
+spec:
+  containers:
+  - name: mosquitto
+    image: eclipse-mosquitto:2.0
+    ports:
+    - containerPort: 1883
+      name: mqtt
+    - containerPort: 9001
+      name: websockets
+    resources:
+      requests:
+        cpu: "200m"
+        memory: "256Mi"
+      limits:
+        cpu: "500m"
+        memory: "512Mi"
+    readinessProbe:
+      tcpSocket:
+        port: 1883
+      initialDelaySeconds: 5
+      periodSeconds: 10
