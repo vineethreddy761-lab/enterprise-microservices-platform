@@ -2,35 +2,46 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
 name: enterprise-ai-inference
-namespace: enterprise-backend
+namespace: enterprise-aiml
+labels:
+app: ai-inference-engine
+tier: tier7-aiml
 spec:
 replicas: 1
 selector:
 matchLabels:
-  app: ai-inference
+  app: ai-inference-engine
 template:
 metadata:
   labels:
-    app: ai-inference
+    app: ai-inference-engine
 spec:
-  affinity:
-    nodeAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-        nodeSelectorTerms:
-        - matchExpressions:
-          - key: topology.kubernetes.io/tier
-            operator: In
-            values:
-            - aiml
+  nodeSelector:
+    node.kubernetes.io/instance-type: g4dn.xlarge
+  tolerations:
+  - key: "nvidia.com/gpu"
+    operator: "Exists"
+    effect: "NoSchedule"
   containers:
-  - name: inference-engine
-    image: python:3.11-slim
-    command: ["python", "-c", "import time; print('AI Inference Engine Running...'); time.sleep(3600)"]
+  - name: triton-inference-server
+    image: nvcr.io/nvidia/tritonserver:23.10-py3
+    ports:
+    - containerPort: 8000
+      name: http
+    - containerPort: 8001
+      name: grpc
     resources:
       requests:
-        cpu: "2000m"
-        memory: "8Gi"
-      limits:
-        cpu: "4000m"
+        cpu: "4"
         memory: "16Gi"
         nvidia.com/gpu: "1"
+      limits:
+        cpu: "8"
+        memory: "32Gi"
+        nvidia.com/gpu: "1"
+    readinessProbe:
+      httpGet:
+        path: /v2/health/ready
+        port: 8000
+      initialDelaySeconds: 15
+      periodSeconds: 10
