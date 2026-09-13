@@ -47,3 +47,12 @@ name: worker-bastion-01
 labels:
 node.kubernetes.io/instance-type: t3.medium
 topology.kubernetes.io/tier: bastion
+
+---
+apiVersion: v1
+kind: Node
+metadata:
+name: worker-cache-01
+labels:
+node.kubernetes.io/instance-type: r6i.xlarge
+topology.kubernetes.io/tier: cache
