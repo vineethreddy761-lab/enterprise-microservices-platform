@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Node
+metadata:
+name: worker-compute-01
+labels:
+node.kubernetes.io/instance-type: c6i.2xlarge
+topology.kubernetes.io/tier: backend
+---
+apiVersion: v1
+kind: Node
+metadata:
+name: worker-storage-01
+labels:
+node.kubernetes.io/instance-type: i3en.2xlarge
+topology.kubernetes.io/tier: data
