@@ -1,21 +1,21 @@
 # Enterprise Microservices Platform
 
-A production-grade, highly scalable, and observable microservices platform running on a Kind Kubernetes cluster with multi-tier architecture, automated GitOps, runtime security, and policy governance.
+An enterprise-grade, multi-tier microservices platform designed for high availability, robust security, and cloud-native resilience across local Kind clusters and production environments.
 
 ## Architecture & Tiers
-- **Cluster & Infrastructure**: Kind (Kubernetes-in-Docker) on Ubuntu.
-- **Tier 1 (Ingress)**: NGINX Ingress Controller (`enterprise.local`).
-- **Tier 2 (Backend)**: Node.js microservice integrated with Redis caching.
-- **Tier 3 (Data)**: PostgreSQL StatefulSet with enterprise database schema and network policies.
-- **Tier 4 (Observability)**: Prometheus, Grafana dashboards, OpenTelemetry, and Vault secret management.
-- **Tier 5 (GitOps)**: ArgoCD application synchronization and canary rollout policies.
-- **Tier 6 (Resilience)**: KEDA autoscaling, Velero backups, chaos engineering experiments, and circuit breakers.
-- **Tier 7 (AI/ML)**: Scalable model inference deployment.
-- **Tier 8 (Developer Portal)**: Internal developer portal integration.
-- **Tier 9 (Edge IoT)**: MQTT-backed sensor publishers and subscribers.
-- **Tier 10 (Governance & Security)**: Falco runtime security monitoring and OPA Gatekeeper policy enforcement.
+The platform is structured into modular enterprise tiers located under `k8s/`:
+- **Tier 1 (Ingress):** NGINX Ingress controller and routing rules.
+- **Tier 2 (Backend):** Express.js microservice deployment and autoscaling objects.
+- **Tier 3 (Data Storage):** PostgreSQL StatefulSet and Redis cache deployments.
+- **Tier 4 & 6 (Observability & Resilience):** Prometheus, Grafana, OpenTelemetry, and Chaos engineering experiments.
+- **Tier 5 & 10 (Gitops & Governance):** ArgoCD applications and OPA policy validators.
 
-## Quick Start & Deployment
-1. Validate all manifests using `python3 validate_all_yaml.py`.
-2. Deploy platform tiers using `python3 deploy_platform.py` or `./scripts/deploy-all.sh`.
-3. Enforce security and governance policies via OPA Gatekeeper and Falco.
+## Automated Local Deployment
+You can fully automate the deployment of core platform services (Namespace, PostgreSQL, Redis, and Express Backend) onto your local Kind cluster using the provided Python automation script:
+
+\`\`\`bash
+python3 deploy_platform.py
+\`\`\`
+
+## CI/CD Pipeline
+The GitHub Actions pipeline (\`.github/workflows/ci-cd.yaml\`) automatically validates all YAML manifests, spins up a test Kind cluster, builds local container images, and executes end-to-end deployment validation on every push or pull request.
