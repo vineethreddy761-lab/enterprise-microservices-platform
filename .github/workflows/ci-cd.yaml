@@ -18,9 +18,7 @@ steps:
     echo "Validating YAML structure across all enterprise tiers..."
     python3 -c "
     import glob, yaml, sys
-    files = glob.glob('**/*.yaml', recursive=True) + glob.glob('**/*.yml', recursive=True)
-    # Filter out github workflow and hidden files if needed
-    manifests = [f for f in files if f.startswith(k8s/)]
+    manifests = glob.glob('k8s/**/*.yaml', recursive=True)
     print(f'Discovered {len(manifests)} Kubernetes manifests.')
     failed = False
     for fpath in manifests:
