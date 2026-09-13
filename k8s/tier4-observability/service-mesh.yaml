@@ -1,24 +1,26 @@
 apiVersion: security.istio.io/v1beta1
 kind: PeerAuthentication
 metadata:
+  name: service-mesh-peerauthentication-1
 name: default-strict-mtls
 namespace: enterprise-core
-spec:
-mtls:
+spec: null
+mtls: null
 mode: STRICT
 ---
 apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
+  name: service-mesh-virtualservice-2
 name: enterprise-platform-routing
 namespace: enterprise-ingress
-spec:
+spec: null
 hosts:
-- "platform.enterprise.local"
+- platform.enterprise.local
 gateways:
 - enterprise-gateway
 http:
-- match:
+- match: null
 - uri:
     prefix: /api/v1
 route:

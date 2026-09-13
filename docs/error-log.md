@@ -1,9 +1,27 @@
-# Enterprise Platform Error Log & Troubleshooting Guide
+# Troubleshooting & Resolved Errors
 
-| Error ID | Component | Symptom | Root Cause | Resolution |
-| :--- | :--- | :--- | :--- | :--- |
-| **ERR-001** | NetworkPolicy / DNS | Upstream pods unable to communicate with PostgreSQL. | Default-deny NetworkPolicy blocking cross-namespace traffic. | Apply explicit namespace allow rules targeting port `5432`. |
-| **ERR-002** | HashiCorp Vault | Database connection failing with unauthorized token. | Vault short-lived lease token expired without auto-renewal. | Verify Vault Agent sidecar annotation configurations and token TTL settings. |
-| **ERR-003** | Nginx Ingress | 502 Bad Gateway during traffic spike. | Shared memory zone exhaustion (`api_limit` too small). | Increase shared memory size parameter in Nginx configuration to `64m` or higher. |
-| **ERR-004** | GitHub Actions | Workflow parsing failure on push. | Invisible carriage return (`\r`) line endings or invalid YAML indentation. | Recreate workflow files using standard Unix line endings (`\n`) and validate via python3. |
-| **ERR-005** | Custom Resources | `kubectl apply --dry-run` failing on unknown CRDs. | Runner environment missing CRD schema definitions for ArgoCD, Flagger, or KEDA. | Separate native Kubernetes object validation from custom YAML syntax checks in CI pipeline. |
+## 1. NGINX Ingress Controller `fork/exec /usr/bin/nginx: input/output error`
+- **Symptom**: NGINX Ingress controller pods entered `CrashLoopBackOff` with `unexpected error obtaining NGINX version`.
+- **Cause**: Incompatible manifest version applied to the Kind cluster.
+- **Resolution**: Uninstalled the main branch manifest and applied a stable version (`controller-v1.10.0`) designed for Kind.
+
+## 2. Database Connection Error `database "enterprise" does not exist`
+- **Symptom**: Backend traffic successfully routed through ingress but failed with a database missing error.
+- **Cause**: The PostgreSQL container was running, but the specific database had not been initialized.
+- **Resolution**: Executed `CREATE DATABASE enterprise;` inside the PostgreSQL StatefulSet pod.
+
+## 3. Helm Release Name Conflict (`cannot reuse a name that is still in use`)
+- **Symptom**: Helm installation failed due to an interrupted prior release.
+- **Resolution**: Ran `helm uninstall monitoring-stack --namespace monitoring` before re-running the installation.
+
+## 4. Otel Collector Block Mapping Parser Error
+- **Symptom**: `yaml.parser.ParserError` encountered at line 27 of `collector.yaml`.
+- **Resolution**: Separated the ConfigMap and Deployment into a clean multi-document manifest.
+
+## 5. Grafana Dashboards ConfigMap JSON Parsing Error
+- **Symptom**: Embedded JSON curly braces in `grafana-dashboards.yaml` misconstrued as block mapping keys.
+- **Resolution**: Simplified the ConfigMap structure into clean key-value text pairs.
+
+## 6. Kind Control Plane Disconnection & API Timeout
+- **Symptom**: `TLS handshake timeout` and missing cluster control plane nodes.
+- **Resolution**: Recreated the Kind cluster and re-exported the kubeconfig context.

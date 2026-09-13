@@ -1,24 +1,31 @@
 apiVersion: constraints.gatekeeper.sh/v1beta1
 kind: K8sRestrictedContainers
 metadata:
+  name: security-constraints-k8srestrictedcontainers-1
 name: block-privileged-containers
-spec:
-match:
+spec: null
+match: null
 kinds:
-  - apiGroups: [""]
-    kinds: ["Pod"]
-parameters:
+- apiGroups:
+  - ''
+  kinds:
+  - Pod
+parameters: null
 runAsRootAllowed: false
 ---
 apiVersion: constraints.gatekeeper.sh/v1beta1
 kind: K8sRequiredResources
 metadata:
+  name: security-constraints-k8srequiredresources-2
 name: require-cpu-memory-limits
-spec:
-match:
+spec: null
+match: null
 kinds:
-  - apiGroups: ["apps"]
-    kinds: ["Deployment", "StatefulSet"]
-parameters:
+- apiGroups:
+  - apps
+  kinds:
+  - Deployment
+  - StatefulSet
+parameters: null
 cpuLimitRequired: true
 memoryLimitRequired: true

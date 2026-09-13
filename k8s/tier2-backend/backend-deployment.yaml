@@ -1,42 +1,32 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-name: core-business-api
-namespace: enterprise-backend
+  name: enterprise-backend
+  namespace: default
 spec:
-replicas: 5
-selector:
-matchLabels:
-  app: core-business-api
-template:
-metadata:
-  labels:
-    app: core-business-api
-spec:
-  priorityClassName: core-business-priority
-  containers:
-  - name: api-server
-    image: python:3.11-slim
-    command: ["python", "-m", "http.server", "8080"]
-    ports:
-    - containerPort: 8080
-    resources:
-      requests:
-        cpu: "500m"
-        memory: "512Mi"
-      limits:
-        cpu: "2000m"
-        memory: "2Gi"
----
-apiVersion: v1
-kind: Service
-metadata:
-name: internal-backend-service
-namespace: enterprise-backend
-spec:
-selector:
-app: core-business-api
-ports:
-- port: 8080
-targetPort: 8080
-type: ClusterIP
+  replicas: 1
+  selector:
+    matchLabels:
+      app: enterprise-backend
+  template:
+    metadata:
+      labels:
+        app: enterprise-backend
+    spec:
+      containers:
+      - name: enterprise-backend
+        image: enterprise-backend:v1
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+        env:
+        - name: DB_HOST
+          value: "enterprise-database-svc"
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_NAME
+          value: "enterprise"
+        - name: DB_USER
+          value: "postgres"
+        - name: DB_PASSWORD
+          value: "secretpassword"

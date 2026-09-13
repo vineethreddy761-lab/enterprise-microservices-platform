@@ -1,19 +1,19 @@
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-name: restrict-database-access
-namespace: enterprise-data
+  name: enterprise-database-netpol
+  namespace: enterprise-data
 spec:
-podSelector:
-matchLabels:
-  app: postgres-db
-policyTypes:
-- Ingress
-ingress:
-- from:
-- namespaceSelector:
+  podSelector:
     matchLabels:
-      environment: enterprise-backend
-ports:
-- protocol: TCP
-  port: 5432
+      app: enterprise-database
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: enterprise-backend
+    ports:
+    - protocol: TCP
+      port: 5432

@@ -1,101 +1,107 @@
 apiVersion: v1
 kind: Node
 metadata:
+  name: node-pools-node-1
 name: worker-compute-01
-labels:
+labels: null
 node.kubernetes.io/instance-type: c6i.2xlarge
 topology.kubernetes.io/tier: backend
 ---
 apiVersion: v1
 kind: Node
 metadata:
+  name: node-pools-node-2
 name: worker-storage-01
-labels:
+labels: null
 node.kubernetes.io/instance-type: i3en.2xlarge
 topology.kubernetes.io/tier: data
-
 ---
 apiVersion: v1
 kind: Node
 metadata:
+  name: node-pools-node-3
 name: worker-gpu-01
-labels:
+labels: null
 node.kubernetes.io/instance-type: g4dn.xlarge
 topology.kubernetes.io/tier: ml-analytics
 ---
 apiVersion: v1
 kind: Node
 metadata:
+  name: node-pools-node-4
 name: worker-edge-01
-labels:
+labels: null
 node.kubernetes.io/instance-type: c6i.xlarge
 topology.kubernetes.io/tier: ingress
-
 ---
 apiVersion: v1
 kind: Node
 metadata:
+  name: node-pools-node-5
 name: worker-security-01
-labels:
+labels: null
 node.kubernetes.io/instance-type: c6i.xlarge
 topology.kubernetes.io/tier: security
 ---
 apiVersion: v1
 kind: Node
 metadata:
+  name: node-pools-node-6
 name: worker-bastion-01
-labels:
+labels: null
 node.kubernetes.io/instance-type: t3.medium
 topology.kubernetes.io/tier: bastion
-
 ---
 apiVersion: v1
 kind: Node
 metadata:
+  name: node-pools-node-7
 name: worker-cache-01
-labels:
+labels: null
 node.kubernetes.io/instance-type: r6i.xlarge
 topology.kubernetes.io/tier: cache
-
 ---
 apiVersion: v1
 kind: Node
 metadata:
+  name: node-pools-node-8
 name: worker-backup-01
-labels:
+labels: null
 node.kubernetes.io/instance-type: t3.xlarge
 topology.kubernetes.io/tier: backup
-
 ---
 apiVersion: v1
 kind: Node
 metadata:
+  name: node-pools-node-9
 name: worker-gpu-01
-labels:
+labels: null
 node.kubernetes.io/instance-type: g4dn.xlarge
 topology.kubernetes.io/tier: aiml
 ---
 apiVersion: v1
 kind: Node
 metadata:
+  name: node-pools-node-10
 name: worker-portal-01
-labels:
+labels: null
 node.kubernetes.io/instance-type: t3.medium
 topology.kubernetes.io/tier: developer-portal
-
 ---
 apiVersion: v1
 kind: Node
 metadata:
+  name: node-pools-node-11
 name: worker-edge-iot-01
-labels:
+labels: null
 node.kubernetes.io/instance-type: t3.small
 topology.kubernetes.io/tier: edge-iot
 ---
 apiVersion: v1
 kind: Node
 metadata:
+  name: node-pools-node-12
 name: worker-governance-01
-labels:
+labels: null
 node.kubernetes.io/instance-type: t3.medium
 topology.kubernetes.io/tier: governance

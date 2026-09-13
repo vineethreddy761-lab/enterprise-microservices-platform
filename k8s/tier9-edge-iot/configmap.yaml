@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mosquitto-config
+  namespace: enterprise-iot
+data:
+  mosquitto.conf: 'listener 1883
+
+    allow_anonymous true
+
+    '

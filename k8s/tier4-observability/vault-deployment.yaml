@@ -1,17 +1,11 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-name: vault
-namespace: enterprise-control-plane
-spec:
-replicas: 1
-selector:
-matchLabels:
-  app: vault
-template:
-metadata:
   labels:
     app: vault
+  name: vault-deployment-deployment-1
+name: vault
+namespace: enterprise-control-plane
 spec:
   containers:
   - name: vault
@@ -21,20 +15,27 @@ spec:
       name: vault-port
     securityContext:
       capabilities:
-        add: ["IPC_LOCK"]
+        add:
+        - IPC_LOCK
     env:
     - name: VAULT_DEV_ROOT_TOKEN_ID
-      value: "enterprise-root-token-change-me"
+      value: enterprise-root-token-change-me
     - name: VAULT_DEV_LISTEN_ADDRESS
-      value: "0.0.0.0:8200"
+      value: 0.0.0.0:8200
+replicas: 1
+selector: null
+matchLabels:
+  app: vault
+template: null
 ---
 apiVersion: v1
 kind: Service
 metadata:
+  name: vault-deployment-service-2
 name: vault-service
 namespace: enterprise-control-plane
-spec:
-selector:
+spec: null
+selector: null
 app: vault
 ports:
 - port: 8200

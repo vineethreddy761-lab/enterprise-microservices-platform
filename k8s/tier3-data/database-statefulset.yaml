@@ -1,64 +1,39 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-name: postgres-cluster
-namespace: enterprise-data
-spec:
-serviceName: "postgres-internal"
-replicas: 2
-selector:
-matchLabels:
-  app: postgres-db
-template:
-metadata:
+  name: enterprise-database
   labels:
-    app: postgres-db
+    app: enterprise-database
 spec:
-  affinity:
-    nodeAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-        nodeSelectorTerms:
-        - matchExpressions:
-          - key: topology.kubernetes.io/tier
-            operator: In
-            values:
-            - data
-  containers:
-  - name: postgres
-    image: postgres:15-alpine
-    ports:
-    - containerPort: 5432
-      name: postgres
-    env:
-    - name: POSTGRES_DB
-      value: enterprise_core
-    - name: POSTGRES_USER
-      valueFrom:
-        secretKeyRef:
-          name: db-secret
-          key: username
-    - name: POSTGRES_PASSWORD
-      valueFrom:
-        secretKeyRef:
-          name: db-secret
-          key: password
-    resources:
-      requests:
-        cpu: "1000m"
-        memory: "2Gi"
-      limits:
-        cpu: "4000m"
-        memory: "8Gi"
+  serviceName: "enterprise-database"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: enterprise-database
+  template:
+    metadata:
+      labels:
+        app: enterprise-database
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:alpine
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_PASSWORD
+          value: "secretpassword"
 ---
 apiVersion: v1
 kind: Service
 metadata:
-name: postgres-internal
-namespace: enterprise-data
+  name: enterprise-database-svc
+  labels:
+    app: enterprise-database
 spec:
-ports:
-- port: 5432
-targetPort: 5432
-clusterIP: None
-selector:
-app: postgres-db
+  clusterIP: None
+  selector:
+    app: enterprise-database
+  ports:
+  - port: 5432
+    targetPort: 5432

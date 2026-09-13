@@ -1,9 +1,8 @@
 apiVersion: templates.gatekeeper.sh/v1beta1
 kind: ConstraintTemplate
 metadata:
+  name: policy-rules-constrainttemplate-1
 name: k8srequiredlabels
-spec:
-crd:
 spec:
   names:
     kind: K8sRequiredLabels
@@ -15,26 +14,28 @@ spec:
           type: array
           items:
             type: string
+crd: null
 targets:
 - target: admission.k8s.gatekeeper.sh
-  rego: |
-    package k8srequiredlabels
-    violation[{"msg": msg}] {
-      provided := {label | input.review.object.metadata.labels[label]}
-      required := {label | label := input.parameters.labels[_]}
-      missing := required - provided
-      count(missing) > 0
-      msg := sprintf("You must provide mandatory labels: %v", [missing])
-    }
+  rego: "package k8srequiredlabels\nviolation[{\"msg\": msg}] {\n  provided := {label\
+    \ | input.review.object.metadata.labels[label]}\n  required := {label | label\
+    \ := input.parameters.labels[_]}\n  missing := required - provided\n  count(missing)\
+    \ > 0\n  msg := sprintf(\"You must provide mandatory labels: %v\", [missing])\n\
+    }\n"
 ---
 apiVersion: constraints.gatekeeper.sh/v1beta1
 kind: K8sRequiredLabels
 metadata:
+  name: policy-rules-k8srequiredlabels-2
 name: all-namespaces-must-have-tier
-spec:
-match:
+spec: null
+match: null
 kinds:
-  - apiGroups: [""]
-    kinds: ["Namespace"]
-parameters:
-labels: ["tier", "environment"]
+- apiGroups:
+  - ''
+  kinds:
+  - Namespace
+parameters: null
+labels:
+- tier
+- environment
