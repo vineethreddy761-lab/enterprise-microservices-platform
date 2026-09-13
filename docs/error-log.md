@@ -23,3 +23,9 @@ Prevention: How to avoid or automate detection in the future.
 - **Root Cause:** The Vault dynamic database secrets engine role was configured with a strict default TTL of `1h`, but the application connection pool cached old credentials and did not listen for secret file updates rendered by the Vault Agent sidecar.
 - **Solution:** Configured Vault Agent template rendering with automated file updates (`vault.hashicorp.com/agent-inject-template`) and implemented an in-memory file watcher in the backend application to gracefully refresh connection pools upon secret rotation.
 - **Prevention:** Mandate dynamic secret rotation handlers in all stateful microservice templates and define explicit lease renewal grace periods in Vault backend roles.
+
+## [ERR-003] Nginx API Gateway Shared Memory Zone Exhaustion and Rate-Limiting Bottlenecks
+- **Symptom:** During high-concurrency synthetic load tests, the Tier 1 Nginx API Gateway started returning `503 Service Temporarily Unavailable` responses, and error logs showed `limiting requests, excess: ... by zone "api_limit"` alongside `no space left in shared memory zone`.
+- **Root Cause:** The `api_limit` shared memory zone size was allocated to a compact `10m`, which became fully exhausted under a massive flood of unique IP addresses. When the zone runs out of space, Nginx fails to allocate tracking nodes for new client keys and rejects legitimate traffic.
+- **Solution:** Increased the shared memory zone allocation size from `10m` to `64m` (supporting over 1 million concurrent tracking states) and introduced dynamic caching map variables to bypass rate-limiting checks safely for internal trusted health-check probes.
+- **Prevention:** Incorporate baseline memory sizing formulas ($1\text{MB}$ per ~16,000 unique client states) during capacity planning and add Prometheus monitoring alerts tracking Nginx shared memory utilization metrics.
