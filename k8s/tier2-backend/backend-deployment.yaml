@@ -29,3 +29,4 @@ spec:
           value: "postgres"
         - name: DB_PASSWORD
           value: "secretpassword"
+# Resources block can be added under containers[0]

@@ -1,0 +1,21 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: db-migration-job
+  namespace: enterprise-backend
+spec:
+  template:
+    spec:
+      containers:
+      - name: migrator
+        image: postgres:15-alpine
+        command: ["sh", "-c", "echo 'Running database migrations...' && sleep 5"]
+        resources:
+          limits:
+            cpu: "100m"
+            memory: "128Mi"
+          requests:
+            cpu: "50m"
+            memory: "64Mi"
+      restartPolicy: Never
+  backoffLimit: 2
