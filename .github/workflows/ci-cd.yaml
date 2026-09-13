@@ -1,45 +1,30 @@
 name: Enterprise 10-Tier CI/CD Pipeline
-
-on:
-push:
-branches: [ "main", "develop", "feature/**" ]
-pull_request:
-branches: [ "main", "develop" ]
-
+'on':
+  push:
+    branches:
+    - main
+    - develop
+    - feature/**
+  pull_request:
+    branches:
+    - main
+    - develop
 jobs:
-validate-platform:
-runs-on: ubuntu-latest
-steps:
-  - name: Checkout Code
-    uses: actions/checkout@v4
-
-  - name: Verify All 10 Tiers YAML Structure
-    run: |
-      echo "Validating YAML structure across all enterprise tiers..."
-      python3 -c "
-      import glob, yaml, sys
-      manifests = glob.glob('k8s/**/*.yaml', recursive=True)
-      print(f'Discovered {len(manifests)} Kubernetes manifests.')
-      failed = False
-      for fpath in manifests:
-          try:
-              with open(fpath, 'r', encoding='utf-8') as f:
-                  list(yaml.safe_load_all(f))
-              print(f'[OK] {fpath}')
-          except Exception as e:
-              print(f'[ERROR] {fpath}: {e}')
-              failed = True
-      if failed:
-          sys.exit(1)
-      print('All manifests verified successfully.')
-      "
-
-  - name: Verify All Shell Scripts Syntax
-    run: |
-      for script in scripts/*.sh; do
-        if [ -f "$script" ]; then
-          chmod +x "$script"
-          bash -n "$script"
-          echo "Syntax check passed: $script"
-        fi
-      done
+  validate-platform:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+    - name: Verify All 10 Tiers YAML Structure
+      run: "echo \"Validating YAML structure across all enterprise tiers...\"\npython3\
+        \ -c \"\nimport glob, yaml, sys\nmanifests = glob.glob('k8s/**/*.yaml', recursive=True)\n\
+        print(f'Discovered {len(manifests)} Kubernetes manifests.')\nfailed = False\n\
+        for fpath in manifests:\n    try:\n        with open(fpath, 'r', encoding='utf-8')\
+        \ as f:\n            list(yaml.safe_load_all(f))\n        print(f'[OK] {fpath}')\n\
+        \    except Exception as e:\n        print(f'[ERROR] {fpath}: {e}')\n    \
+        \    failed = True\nif failed:\n    sys.exit(1)\nprint('All manifests verified\
+        \ successfully.')\n\""
+    - name: Verify All Shell Scripts Syntax
+      run: "for script in scripts/*.sh; do\n  if [ -f \"$script\" ]; then\n    chmod\
+        \ +x \"$script\"\n    bash -n \"$script\"\n    echo \"Syntax check passed:\
+        \ $script\"\n  fi\ndone"
