@@ -1,63 +1,30 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-name: nginx-ingress-config
-namespace: enterprise-ingress
-data:
-nginx.conf: |
-events { worker_connections 1024; }
-http {
-    limit_req_zone $binary_remote_addr zone=api_limit:10m rate=10r/s;
-    upstream backend_tier2 { server internal-backend-service.enterprise.svc.cluster.local:8080; }
-    server {
-        listen 80;
-        location / {
-            limit_req zone=api_limit burst=20 nodelay;
-            proxy_pass http://backend_tier2;
-        }
-    }
-}
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-name: nginx-ingress-gateway
+name: enterprise-ingress-gateway
 namespace: enterprise-ingress
 spec:
-replicas: 3
+replicas: 2
 selector:
 matchLabels:
-  app: nginx-ingress
+  app: ingress-gateway
 template:
 metadata:
   labels:
-    app: nginx-ingress
+    app: ingress-gateway
 spec:
-  nodeSelector:
-    topology.kubernetes.io/tier: ingress
   containers:
   - name: nginx
     image: nginx:alpine
     ports:
     - containerPort: 80
-    volumeMounts:
-    - name: config-vol
-      mountPath: /etc/nginx/nginx.conf
-      subPath: nginx.conf
-  volumes:
-  - name: config-vol
-    configMap:
-      name: nginx-ingress-config
----
-apiVersion: v1
-kind: Service
-metadata:
-name: ingress-gateway-svc
-namespace: enterprise-ingress
-spec:
-type: LoadBalancer
-selector:
-app: nginx-ingress
-ports:
-- port: 80
-targetPort: 80
+      name: http
+    - containerPort: 443
+      name: https
+    resources:
+      requests:
+        cpu: "200m"
+        memory: "256Mi"
+      limits:
+        cpu: "500m"
+        memory: "512Mi"
