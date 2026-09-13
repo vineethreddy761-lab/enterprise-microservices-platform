@@ -65,3 +65,20 @@ name: worker-backup-01
 labels:
 node.kubernetes.io/instance-type: t3.xlarge
 topology.kubernetes.io/tier: backup
+
+---
+apiVersion: v1
+kind: Node
+metadata:
+name: worker-gpu-01
+labels:
+node.kubernetes.io/instance-type: g4dn.xlarge
+topology.kubernetes.io/tier: aiml
+---
+apiVersion: v1
+kind: Node
+metadata:
+name: worker-portal-01
+labels:
+node.kubernetes.io/instance-type: t3.medium
+topology.kubernetes.io/tier: developer-portal
