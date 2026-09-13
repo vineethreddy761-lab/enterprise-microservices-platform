@@ -28,7 +28,7 @@ def main():
         print(f"--- Deploying {tier} to namespace {namespace} ---")
         
         # Create namespace
-        code, out, err = run_cmd(f"kubectl create namespace {namespace} --dry-run=client -o yaml | kubectl apply -f -")
+        code, out, err = run_cmd(f"kubectl apply -f {path}/")
         if code != 0:
             print(f"[-] Status: FAILED (Namespace creation for {tier})")
             deployment_results[tier] = "FAILED"
