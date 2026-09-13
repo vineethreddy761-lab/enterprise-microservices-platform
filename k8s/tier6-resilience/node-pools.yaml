@@ -82,3 +82,20 @@ name: worker-portal-01
 labels:
 node.kubernetes.io/instance-type: t3.medium
 topology.kubernetes.io/tier: developer-portal
+
+---
+apiVersion: v1
+kind: Node
+metadata:
+name: worker-edge-iot-01
+labels:
+node.kubernetes.io/instance-type: t3.small
+topology.kubernetes.io/tier: edge-iot
+---
+apiVersion: v1
+kind: Node
+metadata:
+name: worker-governance-01
+labels:
+node.kubernetes.io/instance-type: t3.medium
+topology.kubernetes.io/tier: governance

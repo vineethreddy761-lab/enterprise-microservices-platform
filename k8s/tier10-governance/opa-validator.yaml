@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+name: enterprise-opa-governance
+namespace: enterprise-control-plane
+spec:
+replicas: 1
+selector:
+matchLabels:
+  app: opa-governance
+template:
+metadata:
+  labels:
+    app: opa-governance
+spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: topology.kubernetes.io/tier
+            operator: In
+            values:
+            - governance
+  containers:
+  - name: opa
+    image: openpolicyagent/opa:latest-rootless
+    args:
+    - "run"
+    - "--server"
+    - "--addr=0.0.0.0:8181"
+    ports:
+    - containerPort: 8181
+      name: http
+    resources:
+      requests:
+        cpu: "200m"
+        memory: "256Mi"
+      limits:
+        cpu: "500m"
+        memory: "512Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+name: governance-service
+namespace: enterprise-control-plane
+spec:
+type: ClusterIP
+selector:
+app: opa-governance
+ports:
+- port: 8181
+targetPort: 8181
