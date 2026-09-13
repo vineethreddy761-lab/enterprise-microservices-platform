@@ -1,0 +1,21 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: NetworkChaos
+metadata:
+name: backend-latency-injection
+namespace: enterprise-backend
+spec:
+action: delay
+mode: one
+selector:
+namespaces:
+  - enterprise-backend
+matchLabels:
+  app: core-business-api
+delay:
+latency: '250ms'
+correlation: '100'
+jitter: '50ms'
+direction: both
+duration: '5m'
+scheduler:
+cron: '@every 2h'
