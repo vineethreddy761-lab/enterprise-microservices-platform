@@ -33,6 +33,8 @@ metadata:
   labels:
     app: nginx-ingress
 spec:
+  nodeSelector:
+    topology.kubernetes.io/tier: ingress
   containers:
   - name: nginx
     image: nginx:alpine

@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+name: enterprise-bastion-host
+namespace: enterprise-security
+spec:
+replicas: 1
+selector:
+matchLabels:
+  app: bastion
+template:
+metadata:
+  labels:
+    app: bastion
+spec:
+  nodeSelector:
+    topology.kubernetes.io/tier: bastion
+  containers:
+  - name: ssh-bastion
+    image: linuxserver/openssh-server:latest
+    env:
+    - name: PUID
+      value: "1000"
+    - name: PGID
+      value: "1000"
+    - name: TZ
+      value: "UTC"
+    ports:
+    - containerPort: 22
+      name: ssh
+    resources:
+      requests:
+        cpu: "200m"
+        memory: "512Mi"
+      limits:
+        cpu: "1000m"
+        memory: "1Gi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+name: bastion-service
+namespace: enterprise-security
+spec:
+type: LoadBalancer
+selector:
+app: bastion
+ports:
+- port: 22
+targetPort: 22
+name: ssh

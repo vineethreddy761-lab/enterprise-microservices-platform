@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+name: internal-developer-portal
+namespace: enterprise-control-plane
+spec:
+replicas: 1
+selector:
+matchLabels:
+  app: dev-portal
+template:
+metadata:
+  labels:
+    app: dev-portal
+spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: topology.kubernetes.io/tier
+            operator: In
+            values:
+            - developer-portal
+  containers:
+  - name: portal
+    image: nginx:alpine
+    ports:
+    - containerPort: 80
+      name: http
+    resources:
+      requests:
+        cpu: "200m"
+        memory: "256Mi"
+      limits:
+        cpu: "500m"
+        memory: "512Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+name: portal-service
+namespace: enterprise-control-plane
+spec:
+type: ClusterIP
+selector:
+app: dev-portal
+ports:
+- port: 80
+targetPort: 80
