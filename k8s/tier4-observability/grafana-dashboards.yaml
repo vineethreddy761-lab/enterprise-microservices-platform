@@ -1,35 +1,37 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-name: grafana-dashboards
-namespace: enterprise-control-plane
+name: grafana-dashboards-config
+namespace: enterprise-observability
 data:
-enterprise-overview.json: |
-{
-  "dashboard": {
-    "title": "Enterprise Multi-Tier Observability Overview",
-    "panels": [
-      {
-        "title": "Tier 1: Ingress Gateway Request Rate & Latency",
-        "type": "timeseries",
-        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 }
-      },
-      {
-        "title": "Tier 2: Backend Priority Pool Resource Utilization",
-        "type": "timeseries",
-        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 }
-      },
-      {
-        "title": "Tier 3: PostgreSQL Active Connections & Lag",
-        "type": "stat",
-        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 }
-      },
-      {
-        "title": "Tier 4: Vault Secret Injections & Dynamic Token TTLs",
-        "type": "bargauge",
-        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 }
-      }
-    ],
-    "refresh": "10s"
-  }
-}
+dashboard-title: "Enterprise Microservices Overview"
+dashboard-timezone: "browser"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+name: grafana
+namespace: enterprise-observability
+spec:
+replicas: 1
+selector:
+matchLabels:
+  app: grafana
+template:
+metadata:
+  labels:
+    app: grafana
+spec:
+  containers:
+  - name: grafana
+    image: grafana/grafana:latest
+    ports:
+    - containerPort: 3000
+      name: http
+    resources:
+      requests:
+        cpu: "200m"
+        memory: "256Mi"
+      limits:
+        cpu: "500m"
+        memory: "512Mi"
