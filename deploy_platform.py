@@ -1,61 +1,27 @@
 import subprocess
-import time
-import sys
 
-TIERS = [
-    ("tier1-ingress", "enterprise-ingress"),
-    ("tier2-backend", "enterprise-backend"),
-    ("tier3-data", "enterprise-data"),
-    ("tier4-observability", "enterprise-observability"),
-    ("tier5-gitops", "enterprise-gitops"),
-    ("tier6-resilience", "enterprise-resilience"),
-    ("tier7-aiml", "enterprise-aiml"),
-    ("tier8-developer-portal", "enterprise-devportal"),
-    ("tier9-edge-iot", "enterprise-iot"),
-    ("tier10-governance", "enterprise-governance")
-]
+def run_cmd(command):
+    print(f"Executing: {command}")
+    result = subprocess.run(command, shell=True)
+    if result.returncode != 0:
+        print(f"Error executing: {command}")
+        exit(1)
 
-def run_cmd(cmd):
-    result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
-    return result.returncode, result.stdout, result.stderr
+print("--- Starting Enterprise Microservices Deployment ---")
 
-def main():
-    print("Starting Throttled Sequential Enterprise Platform Deployment...\n")
-    deployment_results = {}
+# 1. Ensure Namespace exists
+run_cmd("kubectl get namespace enterprise-backend || kubectl create namespace enterprise-backend")
 
-    for tier, namespace in TIERS:
-        path = f"k8s/{tier}"
-        print(f"--- Deploying {tier} to namespace {namespace} ---")
-        
-        # Create namespace
-        code, out, err = run_cmd(f"kubectl apply -f {path}/")
-        if code != 0:
-            print(f"[-] Status: FAILED (Namespace creation for {tier})")
-            deployment_results[tier] = "FAILED"
-            continue
+# 2. Deploy Database (Tier 3)
+print("Deploying Database...")
+run_cmd("kubectl apply -f k8s/tier3-data/database-statefulset.yaml")
 
-        # Apply manifests
-        code, out, err = run_cmd(f"kubectl apply -f {path}/ -n {namespace}")
-        if code != 0:
-            print(f"[-] Status: FAILED (Manifest apply for {tier})")
-            print(err)
-            deployment_results[tier] = "FAILED"
-        else:
-            print(f"[+] Status: SUCCESS ({tier} applied successfully)")
-            deployment_results[tier] = "SUCCESS"
-        
-        print(f"Waiting 20 seconds for {tier} workloads to stabilize...\n")
-        time.sleep(20)
+# 3. Deploy Redis Cache (Tier 3 / Tier 2)
+print("Deploying Redis...")
+run_cmd("kubectl apply -f k8s/tier3-data/redis-cache.yaml")
 
-    print("\n==============================")
-    print("DEPLOYMENT SUMMARY REPORT")
-    print("==============================")
-    for tier, status in deployment_results.items():
-        print(f"{tier}: {status}")
-    print("==============================\n")
+# 4. Deploy Backend (Tier 2)
+print("Deploying Express Backend...")
+run_cmd("kubectl apply -f k8s/tier2-backend/backend-deployment.yaml")
 
-    print("Checking pod status across all namespaces...")
-    subprocess.run("kubectl get pods -A", shell=True)
-
-if __name__ == "__main__":
-    main()
+print("--- Platform Deployment Successfully Completed ---")
