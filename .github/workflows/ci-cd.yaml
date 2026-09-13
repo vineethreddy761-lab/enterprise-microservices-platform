@@ -1,0 +1,35 @@
+name: Enterprise CI/CD Pipeline
+
+on:
+push:
+branches: [ "main", "feature/**" ]
+pull_request:
+branches: [ "main" ]
+
+jobs:
+validate-and-test:
+runs-on: ubuntu-latest
+steps:
+- name: Checkout Code
+  uses: actions/checkout@v4
+
+- name: Set up Kubectl
+  uses: azure/setup-kubectl@v3
+  with:
+    version: 'v1.28.0'
+
+- name: Run Manifest Linter and Dry-Run Validation
+  run: |
+    echo "Validating Kubernetes Manifests across all tiers..."
+    for dir in k8s/tier*; do
+      if [ -d "$dir" ]; then
+        echo "Checking manifests in $dir..."
+        kubectl apply --dry-run=client -k "$dir" || kubectl apply --dry-run=client -f "$dir/"
+      fi
+    done
+
+- name: Verify Deployment Script Executable
+  run: |
+    chmod +x scripts/deploy-all.sh
+    bash -n scripts/deploy-all.sh
+    echo "Master deployment script syntax check passed."
