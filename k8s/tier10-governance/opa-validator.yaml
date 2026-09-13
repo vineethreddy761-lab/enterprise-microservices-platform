@@ -1,54 +1,35 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  name: opa-validator-deployment
+  namespace: gatekeeper-system
   labels:
-    app: opa-governance
-  name: opa-validator-deployment-1
-name: enterprise-opa-governance
-namespace: enterprise-control-plane
+    app: opa-validator
 spec:
-  affinity:
-    nodeAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-        nodeSelectorTerms:
-        - matchExpressions:
-          - key: topology.kubernetes.io/tier
-            operator: In
-            values:
-            - governance
-  containers:
-  - name: opa
-    image: openpolicyagent/opa:latest-rootless
-    args:
-    - run
-    - --server
-    - --addr=0.0.0.0:8181
-    ports:
-    - containerPort: 8181
-      name: http
-    resources:
-      requests:
-        cpu: 200m
-        memory: 32Mi
-      limits:
-        cpu: 500m
-        memory: 32Mi
-replicas: 1
-selector: null
-matchLabels:
-  app: opa-governance
-template: null
+  replicas: 1
+  selector:
+    matchLabels:
+      app: opa-validator
+  template:
+    metadata:
+      labels:
+        app: opa-validator
+    spec:
+      containers:
+      - name: validator
+        image: openpolicyagent/gatekeeper:latest
+        ports:
+        - containerPort: 8443
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: opa-validator-service-2
-name: governance-service
-namespace: enterprise-control-plane
-spec: null
-type: ClusterIP
-selector: null
-app: opa-governance
-ports:
-- port: 8181
-targetPort: 8181
+  name: opa-validator-svc
+  namespace: gatekeeper-system
+spec:
+  type: ClusterIP
+  selector:
+    app: opa-validator
+  ports:
+  - port: 443
+    targetPort: 8443

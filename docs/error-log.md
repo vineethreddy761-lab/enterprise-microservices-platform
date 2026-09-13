@@ -13,3 +13,15 @@
 ## 3. Helm Release Name Conflict (`cannot reuse a name that is still in use`)
 - **Symptom**: Helm installation failed due to an interrupted prior release.
 - **Resolution**: Ran `helm uninstall monitoring-stack --namespace monitoring` before re-running the installation.
+
+## 4. Otel Collector Block Mapping Parser Error
+- **Symptom**: `yaml.parser.ParserError` encountered at line 27 of `collector.yaml`.
+- **Resolution**: Separated the ConfigMap and Deployment into a clean multi-document manifest.
+
+## 5. Grafana Dashboards ConfigMap JSON Parsing Error
+- **Symptom**: Embedded JSON curly braces in `grafana-dashboards.yaml` misconstrued as block mapping keys.
+- **Resolution**: Simplified the ConfigMap structure into clean key-value text pairs.
+
+## 6. Kind Control Plane Disconnection & API Timeout
+- **Symptom**: `TLS handshake timeout` and missing cluster control plane nodes.
+- **Resolution**: Recreated the Kind cluster and re-exported the kubeconfig context.
