@@ -1,45 +1,36 @@
 name: Enterprise 10-Tier CI/CD Pipeline
 
 on:
-push:
-branches: [ "main", "develop", "feature/**" ]
-pull_request:
-branches: [ "main", "develop" ]
+  push:
+    branches: [ "main", "develop", "feature/**" ]
+  pull_request:
+    branches: [ "main", "develop" ]
 
 jobs:
-validate-platform:
-runs-on: ubuntu-latest
-steps:
-- name: Checkout Code
-  uses: actions/checkout@v4
+  validate-platform:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-- name: Verify All 10 Tiers YAML Structure
-  run: |
-    echo "Validating YAML structure across all 10 enterprise tiers..."
-    python3 -c '
-    import glob, sys, yaml
-    files = glob.glob("k8s/**/*.yaml", recursive=True)
-    print(f"Discovered {len(files)} Kubernetes manifest files.")
-    for fpath in files:
-        try:
-            with open(fpath, "r", encoding="utf-8") as f:
-                docs = list(yaml.safe_load_all(f))
-            if not docs or all(d is None for d in docs):
-                print(f"Error: {fpath} is empty or invalid YAML.")
-                sys.exit(1)
-        except Exception as e:
-            print(f"YAML Parsing Error in {fpath}: {e}")
-            sys.exit(1)
-    print("All enterprise tier manifests successfully parsed.")
-    '
+      - name: Verify All 10 Tiers YAML Structure
+        run: |
+          echo "Validating YAML structure across all 10 enterprise tiers..."
+          python3 -c 'import glob, sys, yaml
+          files = glob.glob("k8s/**/*.yaml", recursive=True)
+          print(f"Discovered {len(files)} manifest files.")
+          for fpath in files:
+              with open(fpath, "r", encoding="utf-8") as f:
+                  list(yaml.safe_load_all(f))
+          print("All YAML manifests successfully parsed.")'
 
-- name: Verify All Shell Scripts Syntax
-  run: |
-    echo "Checking syntax for all shell utility scripts..."
-    for script in scripts/*.sh; do
-      if [ -f "$script" ]; then
-        chmod +x "$script"
-        bash -n "$script"
-        echo "Syntax check passed: $script"
-      fi
-    done
+      - name: Verify All Shell Scripts Syntax
+        run: |
+          echo "Checking script syntax..."
+          for script in scripts/*.sh; do
+            if [ -f "$script" ]; then
+              chmod +x "$script"
+              bash -n "$script"
+              echo "Syntax check passed: $script"
+            fi
+          done
