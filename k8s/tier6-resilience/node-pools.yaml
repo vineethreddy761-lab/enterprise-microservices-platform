@@ -13,3 +13,20 @@ name: worker-storage-01
 labels:
 node.kubernetes.io/instance-type: i3en.2xlarge
 topology.kubernetes.io/tier: data
+
+---
+apiVersion: v1
+kind: Node
+metadata:
+name: worker-gpu-01
+labels:
+node.kubernetes.io/instance-type: g4dn.xlarge
+topology.kubernetes.io/tier: ml-analytics
+---
+apiVersion: v1
+kind: Node
+metadata:
+name: worker-edge-01
+labels:
+node.kubernetes.io/instance-type: c6i.xlarge
+topology.kubernetes.io/tier: ingress
