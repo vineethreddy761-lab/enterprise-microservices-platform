@@ -1,0 +1,23 @@
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+name: critical-infra-priority
+value: 1000000
+globalDefault: false
+description: "Highest priority class for control plane, security, and storage routing."
+---
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+name: core-business-priority
+value: 500000
+globalDefault: false
+description: "Medium-high priority class for revenue-generating user-facing microservices."
+---
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+name: batch-worker-priority
+value: 100000
+globalDefault: false
+description: "Low priority class for asynchronous background workers and telemetry aggregation."
