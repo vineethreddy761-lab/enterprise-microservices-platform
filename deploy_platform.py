@@ -16,7 +16,7 @@ run_cmd("kubectl get namespace enterprise-backend || kubectl create namespace en
 print("Deploying Database...")
 run_cmd("kubectl apply -f k8s/tier3-data/database-statefulset.yaml")
 
-# 3. Deploy Redis Cache (Tier 3 / Tier 2)
+# 3. Deploy Redis Cache (Tier 3)
 print("Deploying Redis...")
 run_cmd("kubectl apply -f k8s/tier3-data/redis-cache.yaml")
 

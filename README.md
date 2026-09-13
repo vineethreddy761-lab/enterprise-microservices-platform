@@ -12,5 +12,10 @@ The platform is structured into modular enterprise tiers located under `k8s/`:
 
 ## Automated Local Deployment
 You can fully automate the deployment of core platform services (Namespace, PostgreSQL, Redis, and Express Backend) onto your local Kind cluster using the provided Python automation script:
+
+\`\`\`bash
+python3 deploy_platform.py
+\`\`\`
+
 ## CI/CD Pipeline
-The GitHub Actions pipeline (`.github/workflows/ci-cd.yaml`) automatically validates all YAML manifests, spins up a test Kind cluster, builds local container images, and executes end-to-end deployment validation on every push or pull request.
+The GitHub Actions pipeline (\`.github/workflows/ci-cd.yaml\`) automatically validates all YAML manifests, spins up a test Kind cluster, builds local container images, and executes end-to-end deployment validation on every push or pull request.
