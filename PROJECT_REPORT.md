@@ -41,55 +41,34 @@ The **Enterprise Microservices Platform** is an enterprise-grade, multi-tier clo
 
 ### A. `deploy_platform.py` (Deployment Orchestration)
 - **What it does:** Orchestrates the end-to-end local provisioning of the platform.
-- **Code Breakdown:**
-  ```python
-  import subprocess
+- **Implementation & Code Structure:**
+  - Uses Python's `subprocess` module to execute shell commands securely.
+  - Defines a helper function `run_cmd(command)` that logs execution and exits immediately if any command returns a non-zero exit code.
+- **Dependency:** Relies on Python's `subprocess` module and a running `kubectl` CLI configured with a Kubernetes cluster context.
+- **Execution Flow:**
+  1. Ensures namespace `enterprise-backend` exists (`kubectl get namespace ... || kubectl create namespace ...`).
+  2. Deploys PostgreSQL StatefulSet (`k8s/tier3-data/database-statefulset.yaml`).
+  3. Deploys Redis Cache (`k8s/tier3-data/redis-cache.yaml`).
+  4. Deploys Express Backend (`k8s/tier2-backend/backend-deployment.yaml`).
 
-  def run_cmd(command):
-      print(f"Executing: {command}")
-      result = subprocess.run(command, shell=True)
-      if result.returncode != 0:
-          print(f"Error executing: {command}")
-          exit(1)
-Dependency: Relies on Python's subprocess module and a running kubectl CLI configured with a Kubernetes cluster context.
+### B. `.github/workflows/ci-cd.yaml` (CI/CD Pipeline)
+- **What it does:** Automates validation, cluster provisioning, image building, and deployment testing on GitHub Actions.
+- **Key Jobs:**
+  - `validate-platform`: Parses all `k8s/**/*.yaml` files using PyYAML and runs `bash -n` syntax checks on scripts.
+  - `deploy-cluster`: Spins up a Kind cluster, builds `enterprise-backend:latest`, loads it into Kind, and runs `deploy_platform.py`.
 
-Execution Flow:
+### C. Directory & Manifest Structure (`k8s/`)
+- `k8s/tier3-data/database-statefulset.yaml`: Provisions persistent PostgreSQL storage.
+- `k8s/tier3-data/redis-cache.yaml`: Provisions caching layer for high-throughput operations.
+- `k8s/tier2-backend/backend-deployment.yaml`: Deploys the Express.js microservice container.
 
-Ensures namespace enterprise-backend exists (kubectl get namespace ... || kubectl create namespace ...).
+---
 
-Deploys PostgreSQL StatefulSet (k8s/tier3-data/database-statefulset.yaml).
-
-Deploys Redis Cache (k8s/tier3-data/redis-cache.yaml).
-
-Deploys Express Backend (k8s/tier2-backend/backend-deployment.yaml).
-
-B. .github/workflows/ci-cd.yaml (CI/CD Pipeline)
-What it does: Automates validation, cluster provisioning, image building, and deployment testing on GitHub Actions.
-
-Key Jobs:
-
-validate-platform: Parses all k8s/**/*.yaml files using PyYAML and runs bash -n syntax checks on scripts.
-
-deploy-cluster: Spins up a Kind cluster, builds enterprise-backend:latest, loads it into Kind, and runs deploy_platform.py.
-
-C. Directory & Manifest Structure (k8s/)
-k8s/tier3-data/database-statefulset.yaml: Provisions persistent PostgreSQL storage.
-
-k8s/tier3-data/redis-cache.yaml: Provisions caching layer for high-throughput operations.
-
-k8s/tier2-backend/backend-deployment.yaml: Deploys the Express.js microservice container.
-
-5. How the Project Works (End-to-End Workflow)
-Developer Push: Developer commits changes to a feature branch or main.
-
-GitHub Actions Trigger: CI/CD pipeline triggers automatically.
-
-Validation Stage: Python script scans all 10 tiers of Kubernetes manifests to guarantee 100% syntactical correctness. Shell scripts are checked for syntax errors.
-
-Cluster Provisioning: GitHub Actions spins up an ephemeral Kind Kubernetes cluster.
-
-Image Build & Load: Local Docker image for the backend service is built and loaded into the Kind node.
-
-Automated Orchestration: deploy_platform.py executes sequentially, creating namespaces, databases, caches, and backend workloads.
-
-Verification: kubectl get all -n enterprise-backend confirms all pods and services are running successfully.
+## 5. How the Project Works (End-to-End Workflow)
+1. **Developer Push:** Developer commits changes to a feature branch or `main`.
+2. **GitHub Actions Trigger:** CI/CD pipeline triggers automatically.
+3. **Validation Stage:** Python script scans all 10 tiers of Kubernetes manifests to guarantee 100% syntactical correctness. Shell scripts are checked for syntax errors.
+4. **Cluster Provisioning:** GitHub Actions spins up an ephemeral Kind Kubernetes cluster.
+5. **Image Build & Load:** Local Docker image for the backend service is built and loaded into the Kind node.
+6. **Automated Orchestration:** `deploy_platform.py` executes sequentially, creating namespaces, databases, caches, and backend workloads.
+7. **Verification:** `kubectl get all -n enterprise-backend` confirms all pods and services are running successfully.
